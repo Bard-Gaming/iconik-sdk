@@ -1,15 +1,13 @@
 from typing import Callable, Type, Collection
 import inspect
 
+from api_gen.common import type_name
+
 
 __all__ = ["MethodGeneratorParameter", "MethodGenerator", "ReferencedMethodGenerator"]
 
 
 INDENT_WIDTH = 4
-
-
-def get_type_name(value: Type) -> str:
-    return getattr(value, "__name__", str(value))
 
 
 class MethodGeneratorParameter:
@@ -18,10 +16,10 @@ class MethodGeneratorParameter:
         self.type = value_type if value_type is not inspect._empty else any  # any is a fnc, so __name__ is defined
 
     def __str__(self) -> str:
-        return f"{self.name}: {get_type_name(self.type)}"
+        return f"{self.name}: {type_name(self.type)}"
 
     def __repr__(self) -> str:
-        return f"<parameter {self.name}: {get_type_name(self.type)}>"
+        return f"<parameter {self.name}: {type_name(self.type)}>"
 
 
 class MethodGenerator:
@@ -47,7 +45,7 @@ class MethodGenerator:
             f"{indent_1}def {self.name}(\n"
             f"{indent_2}self,\n"
             f"{params}\n"
-            f"{indent_1}) -> {get_type_name(self.return_type)}:\n"
+            f"{indent_1}) -> {type_name(self.return_type)}:\n"
         )
 
     def _generate_body(self, indent_level: int) -> str:
@@ -61,7 +59,7 @@ class MethodGenerator:
         )
 
     def __repr__(self) -> str:
-        return f"<method {self.name}: ({', '.join(map(str, self.parameters))}) -> {get_type_name(self.return_type)}"
+        return f"<method {self.name}: ({', '.join(map(str, self.parameters))}) -> {type_name(self.return_type)}"
 
 
 class ReferencedMethodGenerator(MethodGenerator):

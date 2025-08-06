@@ -1,5 +1,7 @@
 from typing import Type
+
 from api_gen.method_generator import MethodGenerator
+from api_gen.common import type_name
 
 
 class ClassGeneratorAttribute:
@@ -8,10 +10,10 @@ class ClassGeneratorAttribute:
         self.type = value_type
 
     def __str__(self) -> str:
-        return f"{self.name}: {self.type.__name__}"
+        return f"{self.name}: {type_name(self.type)}"
 
     def __repr__(self) -> str:
-        return f"<attribute {self.name}: {self.type.__name__}>"
+        return f"<attribute {self.name}: {type_name(self.type)}>"
 
 
 class ClassGenerator:
