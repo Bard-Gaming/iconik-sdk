@@ -1,15 +1,35 @@
 #!/bin/bash
 
+OPENAPI_GENERATOR='/tmp/openapi-generator-cli.jar'
+OPENAPI_GENERATOR_SRC='https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/7.14.0/openapi-generator-cli-7.14.0.jar'
+
+
+if ! [ -f "$OPENAPI_GENERATOR" ]; then
+    echo "Generator CLI not found. Installing..." >&2
+    wget "$OPENAPI_GENERATOR_SRC" -O "$OPENAPI_GENERATOR" >&2
+fi
+
 
 generate_api() {
-  rm -rf "$1"
+    if [ -d "$1" ]; then
+        read -rp "Directory $1 already exists. Replace it? [y/N]: " yn
 
-  mkdir "$1"
+        case $yn in
+            Y | y)
+                rm -rf "$1"
+                ;;
+            *)
+                echo "Exiting SDK Generator." >&2
+                exit
+                ;;
+        esac
+    fi
 
-  java -jar openapi-generator-cli.jar generate \
-    -i 'https://app.iconik.io/docs/assets/spec/' \
-    -g python \
-    -o "$1"
+    mkdir "$1"
+    java -jar "$OPENAPI_GENERATOR" generate \
+        -i 'https://app.iconik.io/docs/assets/spec/' \
+        -g python \
+        -o "$1"
 }
 
 
