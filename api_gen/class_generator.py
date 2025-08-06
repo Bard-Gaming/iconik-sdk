@@ -56,4 +56,4 @@ class ClassGenerator:
         )
 
     def __repr__(self) -> str:
-        return f"ClassGenerator({self.name !r})"
+        return f"<class {self.name !r}>"
