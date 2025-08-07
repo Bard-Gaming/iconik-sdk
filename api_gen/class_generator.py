@@ -1,7 +1,13 @@
 from typing import Type
+import logging
 
 from api_gen.method_generator import MethodGenerator
 from api_gen.common import type_name
+
+
+__all__ = ["ClassGenerator", "ClassGeneratorAttribute"]
+
+LOGGER = logging.getLogger("class_generator")
 
 
 class ClassGeneratorAttribute:
@@ -27,11 +33,14 @@ class ClassGenerator:
         self.attributes = attributes
         self.methods = methods
 
-    def generate(self, file_path: str) -> None:
-        with open(file_path, "wt") as file:
-            file.write(self._generate_header())
-            file.write(self._generate_methods())
-            file.write(self._generate_footer())
+    def generate(self) -> str:
+        LOGGER.info(f"Generating class {self.name !r}")
+
+        return (
+            self._generate_header() +
+            self._generate_methods() +
+            self._generate_footer()
+        )
 
     def _generate_header(self) -> str:
         return (
