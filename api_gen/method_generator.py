@@ -1,11 +1,10 @@
-from typing import Callable, Type, Collection
+from typing import Callable, Type, Self, Collection
 import inspect
 
 from api_gen.common import type_name
 
 
 __all__ = ["MethodGeneratorParameter", "MethodGenerator"]
-
 
 INDENT_WIDTH = 4
 
@@ -36,7 +35,7 @@ class MethodGenerator:
         self.body: tuple[str, ...] = tuple(body)
 
     @classmethod
-    def from_reference(cls, name: str, reference: Callable) -> "MethodGenerator":
+    def from_reference(cls, name: str, reference: Callable) -> Self:
         signature = inspect.signature(reference)
 
         parameters = tuple(
