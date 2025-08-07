@@ -55,10 +55,20 @@ class SnakeCaseSymbol(CaseSymbol):
 
 class CamelCaseSymbol(CaseSymbol):
     def is_valid(self) -> bool:
-        return all(
+        # Disallow special characters (such as '_')
+        is_alphanum = all(
             char.isalnum()
             for char in self.value
         )
+
+        # At least a single word must be there,
+        # so at least 1 uppercase letter is required
+        contains_upper = any(
+            char.isupper()
+            for char in self.value
+        )
+
+        return contains_upper and is_alphanum
 
     def to_words(self) -> tuple[str, ...]:
         words = []
@@ -78,23 +88,21 @@ class CamelCaseSymbol(CaseSymbol):
         return cls("".join(word.capitalize() for word in words))
 
 
-def determine_symbol_case(symbol: str) -> Type[SnakeCaseSymbol | CamelCaseSymbol]:
-    symbol_cases = {SnakeCaseSymbol, CamelCaseSymbol}
-
-    for case in symbol_cases:
-        attempt = case(symbol)
-        if attempt.is_valid():
-            return case
-
-    raise ValueError(f"Symbol {symbol !r} is in no known case")
-
-
 SUPPORTED_SYMBOL_CASES = Literal["SNAKE_CASE", "CAMEL_CASE"]
 
 CASE_LOOKUP = {
     "SNAKE_CASE": SnakeCaseSymbol,
     "CAMEL_CASE": CamelCaseSymbol,
 }
+
+
+def determine_symbol_case(symbol: str) -> Type[SnakeCaseSymbol | CamelCaseSymbol]:
+    for case in CASE_LOOKUP.values():
+        attempt = case(symbol)
+        if attempt.is_valid():
+            return case
+
+    raise ValueError(f"Symbol {symbol !r} is in no known case")
 
 def transform_case(symbol: str, target_case: SUPPORTED_SYMBOL_CASES) -> str:
     """
