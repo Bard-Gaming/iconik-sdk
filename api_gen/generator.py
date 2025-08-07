@@ -211,8 +211,8 @@ class SimpleApiGenerator:
         with open(file_path, "wt") as file:
             file.write(self._generate_class_header())
             for method in self._method_names:
-                if method.category == "misc":
-                    file.write(self._generate_method(method))
+                # if method.category == "misc":
+                file.write(self._generate_method(method))
 
     def __repr__(self) -> str:
         return f"SimpleApiGenerator({self.class_name !r}, {self.api.__class__.__name__}())"

@@ -12,7 +12,7 @@ LOGGER = logging.getLogger("file_generator")
 
 class FileGeneratorImport:
     def __init__(self, module: str, symbols: Collection[str] | None = None) -> None:
-        self.module = module,
+        self.module = module
         self.symbols = symbols
 
     def __str__(self) -> str:

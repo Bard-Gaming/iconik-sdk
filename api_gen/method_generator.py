@@ -67,12 +67,13 @@ class MethodGenerator:
 
     def _generate_body(self, indent_level: int) -> str:
         indent = " " * (INDENT_WIDTH * indent_level)
-        return "\n".join(f"{indent}{line}" for line in self.body)
+        return "\n".join(f"{indent}{line}" for line in self.body) + "\n"
 
     def generate(self, indent_level: int = 1) -> str:
         return (
             self._generate_prototype(indent_level) +
-            self._generate_body(indent_level + 1)
+            self._generate_body(indent_level + 1) +
+            "\n"
         )
 
     def __repr__(self) -> str:
