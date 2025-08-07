@@ -4,7 +4,7 @@ import inspect
 from api_gen.common import type_name
 
 
-__all__ = ["MethodGeneratorParameter", "MethodGenerator", "ReferencedMethodGenerator"]
+__all__ = ["MethodGeneratorParameter", "MethodGenerator"]
 
 
 INDENT_WIDTH = 4
@@ -31,9 +31,27 @@ class MethodGenerator:
             body: Collection[str] = ("pass",)
     ) -> None:
         self.name = name
-        self.parameters = parameters
+        self.parameters: tuple[MethodGeneratorParameter, ...] = tuple(parameters)
         self.return_type = return_type
-        self.body = body
+        self.body: tuple[str, ...] = tuple(body)
+
+    @classmethod
+    def from_reference(cls, name: str, reference: Callable) -> "MethodGenerator":
+        signature = inspect.signature(reference)
+
+        parameters = tuple(
+            MethodGeneratorParameter(param.name, param.annotation)
+            for param in signature.parameters.values()
+        )
+
+        return_type = signature.return_annotation
+
+        arguments = ', '.join(param.name for param in parameters)
+        body = (
+            f"return {reference.__name__}({arguments})",
+        )
+
+        return MethodGenerator(name, parameters, return_type, body)
 
     def _generate_prototype(self, indent_level: int) -> str:
         indent_1 = " " * (INDENT_WIDTH * indent_level)
@@ -60,43 +78,3 @@ class MethodGenerator:
 
     def __repr__(self) -> str:
         return f"<method {self.name}: ({', '.join(map(str, self.parameters))}) -> {type_name(self.return_type)}"
-
-
-class ReferencedMethodGenerator(MethodGenerator):
-    def __init__(self, name: str, reference: Callable):
-        self.reference = reference
-
-        signature = inspect.signature(reference)
-
-        parameters = self._transform_parameters([
-            MethodGeneratorParameter(param.name, param.annotation)
-            for param in signature.parameters.values()
-        ])
-
-        return_type = signature.return_annotation
-
-        super().__init__(
-            name,
-            parameters,
-            return_type,
-            self._build_body_from_reference(parameters)
-        )
-
-    def _transform_parameters(
-            self,
-            parameters: Collection[MethodGeneratorParameter]
-    ) -> Collection[MethodGeneratorParameter]:
-        """
-        This method exists to allow subclasses to transform the parameters
-        """
-        return parameters
-
-    def _build_body_from_reference(self, parameters: Collection[MethodGeneratorParameter]) -> Collection[str]:
-        arguments = ', '.join(param.name for param in parameters)
-        return (
-            f"return {self.original_name}({arguments})",
-        )
-
-    @property
-    def original_name(self) -> str:
-        return self.reference.__name__
