@@ -51,7 +51,7 @@ class MethodGenerator:
             f"return {reference.__name__}({arguments})",
         )
 
-        return MethodGenerator(name, parameters, return_type, body)
+        return cls(name, parameters, return_type, body)
 
     def _generate_prototype(self, indent_level: int) -> str:
         indent_1 = " " * (INDENT_WIDTH * indent_level)
