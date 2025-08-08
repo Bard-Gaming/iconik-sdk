@@ -75,12 +75,14 @@ class PythonFunction(GeneratorContainerObject):
     def _generate_header(self, level: int) -> bytes:
         indent = make_indent(1)
 
+        object_type = self.__class__.__name__.removeprefix("Python")
+
         header = (
             f"def {self.name}(",
             *self._generate_params(indent),
             f") -> {self._return_type}:",
             f"{indent}\"\"\"",
-            f"{indent}Function generated using the {self.__module__.split('.')[0]} library.",
+            f"{indent}{object_type} generated using the {self.__module__.split('.')[0]} library.",
             f"{indent}\"\"\"",
         )
 
