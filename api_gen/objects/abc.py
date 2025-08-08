@@ -1,23 +1,12 @@
 import abc
 
 
-__all__ = ["GeneratorObject"]
+__all__ = ["GeneratorObject", "GeneratorContainerObject"]
 
 INDENT_WIDTH: int = 4
 
 
 class GeneratorObject(abc.ABC):
-    @abc.abstractmethod
-    def add(self, other: "GeneratorObject") -> None:
-        """
-        Adds an object to the contents of the instance.
-        All objects can contain other objects.
-
-        For instance, a class may contain methods within
-        its body, but it may also contain another class.
-        """
-        pass
-
     @abc.abstractmethod
     def dump_bytes(self, level: int = 0) -> bytes:
         """
@@ -34,11 +23,24 @@ class GeneratorObject(abc.ABC):
         """
         pass
 
-    def __iadd__(self, other: "GeneratorObject") -> None:
-        return self.add(other)
-
     def __bytes__(self) -> bytes:
         return self.dump_bytes()
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}>"
+
+
+class GeneratorContainerObject(GeneratorObject):
+    @abc.abstractmethod
+    def add(self, other: GeneratorObject) -> None:
+        """
+        Adds an object to the contents of the instance.
+        This object can also be a GeneratorContainerObject.
+
+        For instance, a class may contain methods within
+        its body, but it may also contain another class.
+        """
+        pass
+
+    def __iadd__(self, other: GeneratorObject) -> None:
+        return self.add(other)

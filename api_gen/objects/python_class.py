@@ -1,11 +1,11 @@
-from api_gen.objects.abc import GeneratorObject
+from api_gen.objects.abc import GeneratorObject, GeneratorContainerObject
 from api_gen.objects.common import make_indent
 
 
 __all__ = ["PythonClass"]
 
 
-class PythonClass(GeneratorObject):
+class PythonClass(GeneratorContainerObject):
     def __init__(self, name: str):
         self.name = name
         self._attributes: list[tuple[str, str | None, str | None]] = []
