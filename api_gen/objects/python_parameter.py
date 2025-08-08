@@ -2,6 +2,9 @@ from inspect import Parameter, _empty
 from typing import Self
 
 
+__all__ = ["PythonParameter"]
+
+
 class PythonParameter:
     def __init__(self, name: str, type: str | None, default_value: str | None) -> None:
         self.name = name

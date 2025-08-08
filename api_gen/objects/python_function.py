@@ -6,6 +6,9 @@ from api_gen.objects.python_parameter import PythonParameter
 from api_gen.objects.common import make_indent
 
 
+__all__ = ["PythonFunction"]
+
+
 class PythonFunction(GeneratorContainerObject):
     def __init__(self, name: str) -> None:
         self.name = name
