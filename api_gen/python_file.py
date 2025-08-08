@@ -54,3 +54,17 @@ class PythonFile:
 
     def __repr__(self) -> str:
         return "<PythonFile>"
+
+
+if __name__ == '__main__':
+    from api_gen.objects import *
+
+    a = PythonFile()
+
+    a.add_import("typing", "*")
+    b = PythonClass("IconikApi")
+    b.add_attribute("app_id", "str")
+    b.add_attribute("auth_token", "str")
+    a.add(b)
+
+    print(a.dump_bytes().decode("utf-8"))
