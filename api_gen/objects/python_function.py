@@ -12,7 +12,18 @@ class PythonFunction(GeneratorContainerObject):
 
     def add_parameter(self, name: str, type: str | None = None, default_value: str | None = None) -> None:
         parameter = PythonParameter(name, type, default_value)
+        self.remove_parameter(name)  # remove parameter in case it already exists
         self._parameters.append(parameter)
+
+    def remove_parameter(self, name: str) -> bool:
+        for i in range(len(self._parameters)):
+            if self._parameters[i].name == name:
+                del self._parameters[i]
+                return True
+
+        return False
+
+
 
     def set_return_type(self, type: str) -> None:
         self._return_type = type
