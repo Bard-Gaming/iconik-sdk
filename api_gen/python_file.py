@@ -1,6 +1,6 @@
 from typing import Iterable
 
-from api_gen.objects.abc import GeneratorObject
+from api_gen.objects import GeneratorObject
 
 
 class PythonFile:
@@ -32,7 +32,7 @@ class PythonFile:
         self._contents.append(obj)
 
     def dump_bytes(self) -> bytes:
-        separator = "\n\n".encode("utf-8")  # don't use bytestring (we want UTF-8, not ascii)
+        separator = b"\n\n"
 
         result = b"".join(
             import_stmt.encode("utf-8")
@@ -47,7 +47,7 @@ class PythonFile:
             for obj in self._contents
         )
 
-        return result + "\n".encode("utf-8")  # end with newline for unix :>
+        return result + b"\n"  # end with newline for unix :>
 
     def __bytes__(self) -> bytes:
         return self.dump_bytes()
