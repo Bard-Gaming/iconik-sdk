@@ -5,13 +5,18 @@ from api_gen.objects import GeneratorObject
 
 class PythonFile:
     """
-    The object representation of a python file.
+    Class that represents a Python file with
+    its contents.
 
-    Note: This class isn't a GeneratorObject, as
-    a Python File can't contain a Python File in
-    itself. It is, however, aimed at being used
-    in a similar fashion to GeneratorObjects,
-    purely for ease of use.
+    Note: This class doesn't inherit from GeneratorObject,
+    as this would mean it can be contained within other
+    GeneratorContainerObjects. Alas, a Python file can
+    hardly be contained within a class, function, or
+    any other type of object, hence the reason it isn't
+    a GeneratorObject.
+    However, its methods are kept similar to the ones
+    from GeneratorObjects, so as to make them easier
+    to use.
     """
 
     def __init__(self) -> None:
