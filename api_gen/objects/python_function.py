@@ -1,3 +1,6 @@
+from typing import Self, Callable, overload
+import inspect
+
 from api_gen.objects import GeneratorObject, GeneratorContainerObject
 from api_gen.objects.python_parameter import PythonParameter
 from api_gen.objects.common import make_indent
@@ -7,12 +10,43 @@ class PythonFunction(GeneratorContainerObject):
     def __init__(self, name: str) -> None:
         self.name = name
         self._parameters: list[PythonParameter] = []
-        self._return_type: str = "None"
+        self._return_type: str = "any"
         self._contents: list[GeneratorObject] = []
 
+    @classmethod
+    def from_reference(cls, function: Callable) -> Self:
+        signature = inspect.signature(function)
+
+        self = cls(function.__name__)
+
+        for param in signature.parameters.values():
+            self.add_parameter(PythonParameter.from_signature_parameter(param))
+
+        if signature.return_annotation is not inspect._empty:
+            self.set_return_type(signature.return_annotation)
+
+        return self
+
+    @overload
+    def add_parameter(self, parameter: PythonParameter) -> None:
+        pass
+
+    @overload
     def add_parameter(self, name: str, type: str | None = None, default_value: str | None = None) -> None:
-        parameter = PythonParameter(name, type, default_value)
-        self.remove_parameter(name)  # remove parameter in case it already exists
+        pass
+
+    def add_parameter(
+            self,
+            determinant: PythonParameter | str,
+            ptype: str | None = None,
+            default_value: str | None = None
+    ) -> None:
+        if isinstance(determinant, PythonParameter):
+            self._parameters.append(determinant)
+            return
+
+        parameter = PythonParameter(determinant, ptype, default_value)
+        self.remove_parameter(determinant)  # remove parameter in case it already exists
         self._parameters.append(parameter)
 
     def remove_parameter(self, name: str) -> bool:
@@ -54,6 +88,9 @@ class PythonFunction(GeneratorContainerObject):
     def dump_bytes(self, level: int = 0) -> bytes:
         result = self._generate_header(level)
 
-        result += b"\n".join(obj.dump_bytes(level + 1) for obj in self._contents)
+        if self._contents:
+            result += b"\n".join(obj.dump_bytes(level + 1) for obj in self._contents)
+        else:
+            result += f"{make_indent(level + 1)}pass\n".encode("utf-8")
 
         return result
