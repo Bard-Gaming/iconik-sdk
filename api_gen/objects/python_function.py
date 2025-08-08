@@ -23,8 +23,6 @@ class PythonFunction(GeneratorContainerObject):
 
         return False
 
-
-
     def set_return_type(self, type: str) -> None:
         self._return_type = type
 
