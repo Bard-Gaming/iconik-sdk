@@ -1,4 +1,8 @@
 from api_gen.objects.abc import GeneratorObject, GeneratorContainerObject
+from api_gen.objects.python_parameter import PythonParameter
+from api_gen.objects.python_statement import PythonStatement
+from api_gen.objects.python_function import PythonFunction
+from api_gen.objects.python_method import PythonMethod
 from api_gen.objects.common import make_indent
 
 
@@ -8,18 +12,31 @@ __all__ = ["PythonClass"]
 class PythonClass(GeneratorContainerObject):
     def __init__(self, name: str):
         self.name = name
-        self._attributes: list[tuple[str, str | None, str | None]] = []
+        self._attributes: list[PythonParameter] = []
         self._contents: list[GeneratorObject] = []
 
     def add(self, other: "GeneratorObject") -> None:
         self._contents.append(other)
 
     def add_attribute(self, name: str, type: str = None, default_value: str = None) -> None:
-        self._attributes.append((name, type, default_value))
+        # Attributes and parameters are treated the same, so use PythonParameter
+        attribute = PythonParameter(name, type, default_value)
+        self._attributes.append(attribute)
 
     def _generate_init(self) -> None:
-        init_method = None  # TODO: Implement
-        self._contents.insert(0, init_method)
+        # Don't generate init if it already exists:
+        for object in self._contents:
+            if isinstance(object, PythonFunction) and object.name == "__init__":
+                return
+
+        init = PythonMethod("__init__")
+
+        for attribute in self._attributes:
+            init.add_parameter(attribute)
+            assign_stmt = PythonStatement(f"self.{attribute.name} = {attribute.name}")
+            init.add(assign_stmt)
+
+        self._contents.insert(0, init)
 
     def _generate_header(self, level: int) -> bytes:
         indent = make_indent(1)
